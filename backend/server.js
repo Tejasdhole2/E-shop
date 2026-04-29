@@ -19,7 +19,7 @@ app.use((req, res, next) => {
 
 // 🔗 MongoDB connect (LOCAL - change for production)
 mongoose
-  .connect("mongodb://127.0.0.1:27017/quantumshop")
+  mongoose.connect(process.env.MONGO_URL)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
 
