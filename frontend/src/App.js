@@ -20,20 +20,23 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState([]);
 
-  // ✅ Fetch products from backend
+  // ✅ Fetch products safely
   useEffect(() => {
     fetch(`${API}/products`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch products");
+        return res.json();
+      })
       .then((data) => setProducts(data))
       .catch((err) => console.log("Product fetch error:", err));
   }, []);
 
-  // 🔍 Search filter
+  // 🔍 Safe search filter
   const filteredProducts = products.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
+    (p.name || "").toLowerCase().includes(search.toLowerCase())
   );
 
-  // ✅ Backend cart add
+  // 🛒 Add to cart API
   const addToCart = async (product) => {
     const userId = localStorage.getItem("userId");
 
@@ -43,20 +46,22 @@ export default function App() {
     }
 
     try {
-      await fetch(`${API}/cart/add`, {
+      const res = await fetch(`${API}/cart/add`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userId,
           product: {
             name: product.name,
             price: product.price,
-            qty: 1
-          }
-        })
+            qty: 1,
+          },
+        }),
       });
+
+      if (!res.ok) throw new Error("Cart error");
 
       alert("✅ Added to cart");
     } catch (err) {
@@ -74,10 +79,7 @@ export default function App() {
           element={
             <>
               <Hero />
-              <Home
-                products={filteredProducts}
-                addToCart={addToCart}
-              />
+              <Home products={filteredProducts} addToCart={addToCart} />
             </>
           }
         />
@@ -85,8 +87,6 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
-
-        {/* ✅ ADMIN PAGE */}
         <Route path="/admin" element={<Admin />} />
       </Routes>
 
