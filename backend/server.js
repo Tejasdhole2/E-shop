@@ -4,11 +4,11 @@ const cors = require("cors");
 
 const app = express();
 
-// ✅ Middleware
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// 🔒 FIX: CSP (for audio / base64 issues)
+// CSP FIX
 app.use((req, res, next) => {
   res.setHeader(
     "Content-Security-Policy",
@@ -17,27 +17,27 @@ app.use((req, res, next) => {
   next();
 });
 
-// 🔗 MongoDB connect (LOCAL - change for production)
+// MongoDB connect (RENDER SAFE)
 mongoose
-  mongoose.connect(process.env.MONGO_URL)
+  .connect(process.env.MONGO_URL)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
 
-// 📌 API Routes
+// Routes
 app.use("/", require("./routes/auth"));
 app.use("/", require("./routes/cart"));
 app.use("/", require("./routes/order"));
 app.use("/", require("./routes/product"));
 
-// 📸 Static files (images)
+// Static files
 app.use("/uploads", express.static("uploads"));
 
-// ✅ ROOT ROUTE FIX (IMPORTANT)
+// Root route
 app.get("/", (req, res) => {
   res.send("QuantumShop API is running 🚀");
 });
 
-// 🚀 Server start
+// Server start
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
