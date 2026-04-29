@@ -1,1 +1,1 @@
-const API = "https://your-backend.onrender.com";
+const API = "https://quantumshop-api.onrender.com";
